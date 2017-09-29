@@ -1,0 +1,48 @@
+const endpoint = "https://runkit.io/edelmanja/charity-microtransactions/branches/master";
+
+function buildUrl(name){
+  return `${endpoint}/${name}`;
+}
+
+function getResponse(val){
+  return fetch(buildUrl(val));
+}
+
+function update(object, val){
+    object.setState({text:"updating..."})
+    return getResponse(val)
+      .then((data)=>data.json())
+      .then((data)=>object.setState({ 
+        text: data.name 
+    }))
+      .catch(console.log)
+}
+
+let debouncedUpdate = _.debounce(update, 1000);
+
+class App extends React.Component{
+  constructor()
+  {
+    super()
+    this.state = {text:""};
+  }
+  
+  handleChange(event){
+    debouncedUpdate(this, event.target.value);
+  }
+  
+  render()
+  {
+    const state = this.state;
+    let onChange = (evt)=>this.handleChange(evt);
+    console.log("rendering");
+    return (
+      <div>
+        <input type="text" onChange={onChange}/>
+        <div>{state.text}</div>
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
