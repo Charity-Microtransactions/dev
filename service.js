@@ -1,6 +1,38 @@
-var express = require("@runkit/runkit/express-endpoint/1.0.0"); 
+var express = require("@runkit/runkit/express-endpoint/1.0.0");
 var aws = require('aws-sdk')
 var app = express(exports);
+const DONOR_TYPE = "DONOR";
+const CHARITY_TYPE = "CHARITY";
+
+class Profile {
+    constructor (id, name, description){
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.type = "";
+    }
+    get type(){
+        return this.type;
+    }
+}
+
+class Donor extends Profile {
+    get type(){ return DONOR_TYPE; }
+}
+
+class Charity extends Profile {
+    get type() { return CHARITY_TYPE; }
+}
+
+class Transaction {
+    constructor (id, from_id, to_id, amount, date){
+        this.id = id;
+        this.from_id = from_id;
+        this.to_id = to_id;
+        this.amount = amount;
+        this.date  = date;
+    }
+}
 
 //enable CORS
 app.use(function(req, res, next) {
