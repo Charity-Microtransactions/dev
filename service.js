@@ -1,4 +1,6 @@
 var express = require("@runkit/runkit/express-endpoint/1.0.0");
+var randomWords = require("random-words")
+var uuid = require("uuid/v4");
 var aws = require('aws-sdk')
 var app = express(exports);
 const DONOR_TYPE = "DONOR";
@@ -14,6 +16,14 @@ class Profile {
     get type(){
         return this.type;
     }
+}
+
+function randomDonor(){
+    return new Donor (uuid(), randomWords(3), randomWords(50));
+}
+
+function randomCharity(){
+    return new Chairty (uuid(), randomWords(3), randomWords(50));
 }
 
 class Donor extends Profile {
@@ -40,6 +50,15 @@ class ProfileRepository = Base => class extends Base {
 }
 
 class TransactionRepository = Base => class extends Base {
+    getTransaction(transaction_id) { }
+    createOrUpdateTransaction(transaction) { }
+}
+
+class DummyRepository extends ProfileRepository(TransactionRepository(Object)) {
+    getProfile(profile_id) { 
+        
+    }
+    createOrUpdateProfile(profile) { }
     getTransaction(profile_id) { }
     createOrUpdateTransaction(profile) { }
 }
