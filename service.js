@@ -1,4 +1,5 @@
 var express = require("@runkit/runkit/express-endpoint/1.0.0");
+var bodyParser = require("body-parser");
 var randomWords = require("random-words")
 var uuid = require("uuid/v4");
 var aws = require('aws-sdk')
@@ -54,16 +55,31 @@ class TransactionRepository = Base => class extends Base {
     createOrUpdateTransaction(transaction) { }
 }
 
-class DummyRepository extends ProfileRepository(TransactionRepository(Object)) {
+class ProfileSearcher = Base => class extends Base {
+    findProfile(query){ }
+}
+
+class TransactionSearcher = Base => class extends Base {
+    findTransaction(query) { }
+}
+
+
+class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepository(Object))) {
     getProfile(profile_id) { 
         
     }
     createOrUpdateProfile(profile) { }
     getTransaction(profile_id) { }
     createOrUpdateTransaction(profile) { }
+    findProfile(query){ }
 }
 
+var repo = new DummyRepository();
+
 //enable CORS
+
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -80,28 +96,30 @@ app.get("/:name?", (req, res) => {
 
 app.get("/search", searchProfiles)
 
-app.get("/profile/:name?", getProfile)
+app.get("/profile/:id?", getProfile)
 app.get("/transaction/:id?", getTransaction)
 
 app.post("/profile", createOrUpdateProfile);
 app.post("/transaction", createOrUpdateTransaction);
 
 function getProfile(req, res){
-
+    res.send(repo.getProfile(req.params.id));
 }
 
 function createOrUpdateProfile(req, res){
-
+    repo.createOrUpdateProfile(req.body);
+    res.status(200).end();
 }
 
 function searchProfiles(req, res){
-
+    res.send(repo.findProfile(res.params.q));
 }
 
 function getTransaction(req, res){
-
+    res.send(repo.getTransaction(req.params.id));
 }
 
 function createOrUpdateTransaction(req, res){
-
+    repo.createOrUpdateTransaction(req.body);
+    res.status(200).end();
 }
