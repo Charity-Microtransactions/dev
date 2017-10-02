@@ -34,6 +34,16 @@ class Transaction {
     }
 }
 
+class ProfileRepository = Base => class extends Base {
+    getProfile(profile_id) { }
+    createOrUpdateProfile(profile) { }
+}
+
+class TransactionRepository = Base => class extends Base {
+    getTransaction(profile_id) { }
+    createOrUpdateTransaction(profile) { }
+}
+
 //enable CORS
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
