@@ -1,17 +1,4 @@
 const endpoint = "https://runkit.io/edelmanja/charity-microtransactions/branches/master";
-$.ajaxSetup({
-  
-})
-let log = (message) => (e)=> {
-  console.log(message);
-  console.log(e);
-}
-
-function check(promise){
-  return promise
-    .then(log("done"))
-    .catch(log("fail"))
-}
 
 function buildUrl(name){
   return endpoint + "/" + name;
