@@ -1,4 +1,5 @@
 var express = require("@runkit/runkit/express-endpoint/1.0.0");
+var _ = require("underscore");
 var bodyParser = require("body-parser");
 var randomWords = require("random-words")
 var uuid = require("uuid/v4");
@@ -24,7 +25,11 @@ function randomDonor(){
 }
 
 function randomCharity(){
-    return new Chairty (uuid(), randomWords(3), randomWords(50));
+    return new Charity (uuid(), randomWords(3), randomWords(50));
+}
+
+function randomTransaction(from_id, to_id){
+    return new Transaction(uuid, from_id, to_id, _.random(1,1000), new Date());
 }
 
 class Donor extends Profile {
@@ -61,25 +66,61 @@ class ProfileSearcher = Base => class extends Base {
 
 class TransactionSearcher = Base => class extends Base {
     findTransaction(query) { }
+    getTransactionsForProfile(id) { }
 }
 
 
 class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepository(Object))) {
-    getProfile(profile_id) { 
-        
+    constructor(){
+        [this.profiles, this.transactions] = [[], []];
     }
-    createOrUpdateProfile(profile) { }
-    getTransaction(profile_id) { }
-    createOrUpdateTransaction(profile) { }
-    findProfile(query){ }
+    getProfile(profile_id) { 
+        return _.find(this.profiles, p => p.id === profile_id);
+    }
+    getTransactionsForProfile(id) { 
+        return _.filter(this.transactions, t => t.from_id === id || t.to_id === id);
+    }
+    createOrUpdateProfile(profile) { 
+        var existingProf = getProfile(profile.id);
+        if(existingProf)
+        {
+            var idx = _.indexOf(this.profiles, existingProf);
+            this.profiles[idx] = profile;
+        }
+        else
+        {
+            this.profiles.push(profile);
+        }
+    }
+    getTransaction(transaction_id) {
+        return _.find(this.transactions, t => t.id === transaction_id);
+    }
+    createOrUpdateTransaction(profile) { 
+    
+    }
+    findProfile(query) { 
+        var searchTest = new RegExp(query, "ig");
+    
+        return _.filter(this.profiles, p=> 
+            searchTest.test(p.id) 
+            || searchTest.test(p.name) 
+            || searchTest.test(p.description));
+    }
 }
 
 var repo = new DummyRepository();
 
-//enable CORS
+function populateDummyRepo(dummyRepo){
+    if(!(dummyRepo instanceOf DummyRepository)){
+        throw new Exception("populateDummyRepo called without DummyRepository");
+    }
+    dummyRepo.profiles = 
+}
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+//enable CORS
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -97,6 +138,7 @@ app.get("/:name?", (req, res) => {
 app.get("/search", searchProfiles)
 
 app.get("/profile/:id?", getProfile)
+app.get("/profile/:id/transactions", getTransactionsByProfile);
 app.get("/transaction/:id?", getTransaction)
 
 app.post("/profile", createOrUpdateProfile);
@@ -104,6 +146,10 @@ app.post("/transaction", createOrUpdateTransaction);
 
 function getProfile(req, res){
     res.send(repo.getProfile(req.params.id));
+}
+
+function getTransactionsByProfile(req, res){
+
 }
 
 function createOrUpdateProfile(req, res){
