@@ -38,26 +38,40 @@ class App extends React.Component{
   constructor()
   {
     super()
-    this.state = {text:""};
+    this.navStates={
+      browseCharities:"browseCharities",
+      searchCharities:"searchCharities",
+      searchDonors:"searchDonors",
+      recentTransactions:"recentTransactions"
+    }
+    this.state = {
+      text:"",
+      navState:this.navStates.browseCharities
+    };
   }
   
   handleChange(event){
     update(this, event.target.value)
   }
   
+  navClick(navId){
+    return (evt)=>this.setState({ navState : navId });
+  }
+  
   render()
   {
     const state = this.state;
     var items = [
-      {name:"Search Charities"},
-      {name:"Search Donors"},
-      {name:"Recent Transactions"}
+      {name:"Browse Charities", onClick:this.navClick(this.navStates.browseCharities) },
+      {name:"Search Charities", onClick:this.navClick(this.navStates.searchCharities) },
+      {name:"Search Donors", onClick:this.navClick(this.navStates.searchDonors) },
+      {name:"Recent Transactions", onClick:this.navClick(this.navStates.recentTransactions) }
     ];
     return (
       <div>
         <Nav items={items} />
+        <div>current nav state:{this.state.navState}</div>
         <input type="text" onChange={(event)=>this.handleChange(event)}/>
-        <div>text</div>
         <div>{state.text}</div>
       </div>
     )
