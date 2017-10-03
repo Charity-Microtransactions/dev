@@ -8,37 +8,70 @@ function getResponse(val){
   return fetch(buildUrl(val));
 }
 
-function update(object, val){
-    object.setState({text:"updating..."})
-    return getResponse(val)
-      .then((data)=>data.json())
-      .then((data)=>object.setState({ 
-        text: data.name 
-    }))
-      .catch(console.log)
+function update(object, event){
+    return getResponse(event.target.value)
+      .then((data)=>{
+        console.log(data);
+        object.setState({ text: data })
+      .catch((err)=>console.log(err))
+
+    })                                
 }
 
-let debouncedUpdate = _.debounce(update, 1000);
+function NavItem(props){
+  return <li><a href="#" onClick={props.onClick}>{props.name}</a></li>
+}
+
+function Nav(props){
+  var items = [];
+  for(let item of props.items)
+    items.push(<NavItem onClick={item.onClick} name={item.name} />);
+  
+  return <nav>
+    <ul>
+      {items}
+    </ul>
+    </nav>
+}
 
 class App extends React.Component{
   constructor()
   {
     super()
-    this.state = {text:""};
+    this.navStates={
+      browseCharities:"browseCharities",
+      searchCharities:"searchCharities",
+      searchDonors:"searchDonors",
+      recentTransactions:"recentTransactions"
+    }
+    this.state = {
+      text:"",
+      navState:this.navStates.browseCharities
+    };
   }
   
   handleChange(event){
-    debouncedUpdate(this, event.target.value);
+    update(this, event.target.value)
+  }
+  
+  navClick(navId){
+    return (evt)=>this.setState({ navState : navId });
   }
   
   render()
   {
     const state = this.state;
-    let onChange = (evt)=>this.handleChange(evt);
-    console.log("rendering");
+    var items = [
+      {name:"Browse Charities", onClick:this.navClick(this.navStates.browseCharities) },
+      {name:"Search Charities", onClick:this.navClick(this.navStates.searchCharities) },
+      {name:"Search Donors", onClick:this.navClick(this.navStates.searchDonors) },
+      {name:"Recent Transactions", onClick:this.navClick(this.navStates.recentTransactions) }
+    ];
     return (
       <div>
-        <input type="text" onChange={onChange}/>
+        <Nav items={items} />
+        <div>current nav state:{this.state.navState}</div>
+        <input type="text" onChange={(event)=>this.handleChange(event)}/>
         <div>{state.text}</div>
       </div>
     )
