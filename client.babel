@@ -1,7 +1,7 @@
 const endpoint = "https://runkit.io/edelmanja/charity-microtransactions/branches/master";
 
 function buildUrl(name){
-  return endpoint + "/" + name;
+  return `${endpoint}/${name}`;
 }
 
 function getResponse(val){
