@@ -1,24 +1,51 @@
 const endpoint = "https://runkit.io/edelmanja/charity-microtransactions/branches/master";
+$.ajaxSetup({
+  
+})
+let log = (message) => (e)=> {
+  console.log(message);
+  console.log(e);
+}
+
+function check(promise){
+  return promise
+    .then(log("done"))
+    .catch(log("fail"))
+}
 
 function buildUrl(name){
-  return `${endpoint}/${name}`;
+  return endpoint + "/" + name;
 }
 
 function getResponse(val){
   return fetch(buildUrl(val));
 }
 
-function update(object, val){
-    object.setState({text:"updating..."})
-    return getResponse(val)
-      .then((data)=>data.json())
-      .then((data)=>object.setState({ 
-        text: data.name 
-    }))
-      .catch(console.log)
+function update(object, event){
+    return getResponse(event.target.value)
+      .then((data)=>{
+        console.log(data);
+        object.setState({ text: data })
+      .catch((err)=>console.log(err))
+
+    })                                
 }
 
-let debouncedUpdate = _.debounce(update, 1000);
+function NavItem(props){
+  return <li><a href="#" onClick={props.onClick}>{props.name}</a></li>
+}
+
+function Nav(props){
+  var items = [];
+  for(let item of props.items)
+    items.push(<NavItem onClick={item.onClick} name={item.name} />);
+  
+  return <nav>
+    <ul>
+      {items}
+    </ul>
+    </nav>
+}
 
 class App extends React.Component{
   constructor()
@@ -28,17 +55,22 @@ class App extends React.Component{
   }
   
   handleChange(event){
-    debouncedUpdate(this, event.target.value);
+    update(this, event.target.value)
   }
   
   render()
   {
     const state = this.state;
-    let onChange = (evt)=>this.handleChange(evt);
-    console.log("rendering");
+    var items = [
+      {name:"Search Charities"},
+      {name:"Search Donors"},
+      {name:"Recent Transactions"}
+    ];
     return (
       <div>
-        <input type="text" onChange={onChange}/>
+        <Nav items={items} />
+        <input type="text" onChange={(event)=>this.handleChange(event)}/>
+        <div>text</div>
         <div>{state.text}</div>
       </div>
     )
