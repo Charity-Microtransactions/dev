@@ -1,4 +1,5 @@
-var express = require("@runkit/runkit/express-endpoint/1.0.0");
+//var express = require("@runkit/runkit/express-endpoint/1.0.0");
+var express = require("express")
 var _ = require("underscore");
 var bodyParser = require("body-parser");
 var randomWords = require("random-words")
@@ -72,15 +73,16 @@ var TransactionSearcher = Base => class extends Base {
 
 class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepository(Object))) {
     constructor(){
-        [this.profiles, this.transactions] = [[], []];
+        this.profiles = [];
+        this.transactions = [];
     }
-    getProfile(profile_id) { 
+    getProfile(profile_id) {
         return _.find(this.profiles, p => p.id === profile_id);
     }
-    getTransactionsForProfile(id) { 
+    getTransactionsForProfile(id) {
         return _.filter(this.transactions, t => t.from_id === id || t.to_id === id);
     }
-    createOrUpdateProfile(profile) { 
+    createOrUpdateProfile(profile) {
         var existingProf = getProfile(profile.id);
         if(existingProf)
         {
@@ -95,22 +97,22 @@ class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepos
     getTransaction(transaction_id) {
         return _.find(this.transactions, t => t.id === transaction_id);
     }
-    createOrUpdateTransaction(profile) { 
-    
+    createOrUpdateTransaction(profile) {
+
     }
-    findProfile(query) { 
+    findProfile(query) {
         var searchTest = new RegExp(query, "ig");
-    
-        return _.filter(this.profiles, p=> 
-            searchTest.test(p.id) 
-            || searchTest.test(p.name) 
+
+        return _.filter(this.profiles, p=>
+            searchTest.test(p.id)
+            || searchTest.test(p.name)
             || searchTest.test(p.description));
     }
 }
 
 var repo = new DummyRepository();
 
-function populateDummyRepo(dummyRepo){  
+function populateDummyRepo(dummyRepo){
     var donors = _.range(10).map(randomDonor);
     var charities = _.range(10).map(randomCharity);
     var transactions = _.zip(
@@ -134,8 +136,8 @@ app.use(function(req, res, next) {
 // test echo service
 app.get("/:name?", (req, res) => {
     res.setHeader("Content-Type", "text/json");
-    res.send(JSON.stringify({ 
-        name:req.params.name 
+    res.send(JSON.stringify({
+        name:req.params.name
     }))
 })
 
