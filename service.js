@@ -111,10 +111,17 @@ class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepos
 var repo = new DummyRepository();
 
 function populateDummyRepo(dummyRepo){
-    if(!(dummyRepo instanceOf DummyRepository)){
-        throw new Exception("populateDummyRepo called without DummyRepository");
+    if(!(dummyRepo instanceOf(DummyRepository))){
+        throw "populateDummyRepo called without DummyRepository";
     }
-    dummyRepo.profiles = 
+    var donors = _.range(10).map(randomDonor);
+    var charities = _.range(10).map(randomCharity);
+    var transactions = _.zip(
+        _.sample(donors, 50),
+        _.sample(charities, 50),
+        (d,c) => randomTransaction(d.id, c.id));
+    dummyRepo.profiles = _.union(donors, charities);
+    dummyRepo.transactions = transactions;
 }
 
 app.use(bodyParser.json()); // for parsing application/json
