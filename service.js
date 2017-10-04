@@ -99,6 +99,10 @@ class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepos
     
     }
     findProfile(query) { 
+        if(!query){
+            return this.profiles;
+        }
+        
         var searchTest = new RegExp(query, "ig");
     
         return _.filter(this.profiles, p=> 
@@ -114,7 +118,12 @@ function populateDummyRepo(dummyRepo){
     if(!(dummyRepo instanceOf DummyRepository)){
         throw new Exception("populateDummyRepo called without DummyRepository");
     }
-    dummyRepo.profiles = 
+    var donors = _.range(10).map(randomDonor);
+    var charities = _.range(10).map(randomCharity)
+    dummyRepo.profiles = _.union(donors, charities);
+    dummyRepo.transactions = _.zip( 
+        _.sample(donors, 50),
+        _.sample(charities, 50), d, c => randomTransaction(d.id, c.id));
 }
 
 app.use(bodyParser.json()); // for parsing application/json
@@ -149,7 +158,7 @@ function getProfile(req, res){
 }
 
 function getTransactionsByProfile(req, res){
-
+    res.send(repo.getTransactionsForProfile(req.id));
 }
 
 function createOrUpdateProfile(req, res){
