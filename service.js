@@ -110,10 +110,7 @@ class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepos
 
 var repo = new DummyRepository();
 
-function populateDummyRepo(dummyRepo){
-    if(!(dummyRepo instanceOf(DummyRepository))){
-        throw "populateDummyRepo called without DummyRepository";
-    }
+function populateDummyRepo(dummyRepo){  
     var donors = _.range(10).map(randomDonor);
     var charities = _.range(10).map(randomCharity);
     var transactions = _.zip(
