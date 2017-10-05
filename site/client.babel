@@ -1,7 +1,4 @@
-import React from 'react';
-import {render} from 'react-dom';
-
-const endpoint = "https://runkit.io/edelmanja/charity-microtransactions/branches/master";
+const endpoint = "//";
 
 function buildUrl(name){
   return `${endpoint}/${name}`;
@@ -18,7 +15,7 @@ function update(object, event){
         object.setState({ text: data })
       .catch((err)=>console.log(err))
 
-    })                                
+    })
 }
 
 function NavItem(props){
@@ -29,7 +26,7 @@ function Nav(props){
   var items = [];
   for(let item of props.items)
     items.push(<NavItem onClick={item.onClick} name={item.name} />);
-  
+
   return <nav>
     <ul>
       {items}
@@ -52,15 +49,15 @@ class App extends React.Component{
       navState:this.navStates.browseCharities
     };
   }
-  
+
   handleChange(event){
     update(this, event.target.value)
   }
-  
+
   navClick(navId){
     return (evt)=>this.setState({ navState : navId });
   }
-  
+
   render()
   {
     const state = this.state;

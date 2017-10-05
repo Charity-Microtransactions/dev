@@ -1,0 +1,23 @@
+{
+  "name":"charity-microtransactions",
+  "version":"0.0.1",
+  "bugs":{
+    "url":"https://github.com/Charity-Microtransactions/dev/issues",
+    "email":"edelmanja@gmail.com"
+  },
+  "license":"MIT",
+  "main":"service/service.js",
+  "repository":{
+    "type":"git",
+    "url":"https://github.com/Charity-Microtransactions/dev.git"
+  },
+  "dependencies":{
+    "gulp":"*",
+    "express":"*",
+    "underscore":"*",
+    "body-parser":"*",
+    "random-words":"*",
+    "uuid":"*",
+    "aws-sdk":"*"
+  }
+}

@@ -1,10 +1,10 @@
-var express = require("@runkit/runkit/express-endpoint/1.0.0");
+var express = require("express");
 var _ = require("underscore");
 var bodyParser = require("body-parser");
 var randomWords = require("random-words")
 var uuid = require("uuid/v4");
 var aws = require('aws-sdk')
-var app = express(exports);
+var app = express();
 const DONOR_TYPE = "DONOR";
 const CHARITY_TYPE = "CHARITY";
 
@@ -70,9 +70,12 @@ var TransactionSearcher = Base => class extends Base {
 }
 
 
-class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepository(Object))) {
+class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepository(Object)))
+{
     constructor(){
-        [this.profiles, this.transactions] = [[], []];
+      super();
+        this.profiles = [];
+        this.transactions = [];
     }
     getProfile(profile_id) {
         return _.find(this.profiles, p => p.id === profile_id);
@@ -133,14 +136,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-// test echo service
-app.get("/:name?", (req, res) => {
-    res.setHeader("Content-Type", "text/json");
-    res.send(JSON.stringify({
-        name:req.params.name
-    }))
-})
-
 app.get("/search", searchProfiles)
 
 app.get("/profile/:id?", getProfile)
@@ -175,3 +170,5 @@ function createOrUpdateTransaction(req, res){
     repo.createOrUpdateTransaction(req.body);
     res.status(200).end();
 }
+
+app.listen(3000, () => console.log("listening on port 3000"))
