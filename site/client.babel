@@ -1,4 +1,4 @@
-const endpoint = "//";
+const endpoint = "https://runkit.io/edelmanja/charity-microtransactions/branches/master";
 
 function buildUrl(name){
   return `${endpoint}/${name}`;
@@ -19,18 +19,24 @@ function update(object, event){
 }
 
 function NavItem(props){
-  return <li><a href="#" onClick={props.onClick}>{props.name}</a></li>
+  var className = props.active ? "nav-item active" : "nav-item";
+  console.log(className);
+  return <li className={className}><a className="nav-link" href="#" onClick={props.onClick}>{props.name}</a></li>
 }
 
 function Nav(props){
   var items = [];
   for(let item of props.items)
-    items.push(<NavItem onClick={item.onClick} name={item.name} />);
+    items.push(<NavItem active={props.active == item.state} onClick={item.onClick} name={item.name} />);
 
-  return <nav>
-    <ul>
+  return <nav className="navbar navbar-light bg-faded">
+    <ul className="nav">
       {items}
     </ul>
+    <form className="form-inline">
+      <input type="text" className="form-control" placeholder="Search" />
+      <button className="btn btn-outline-success">Search</button>
+    </form>
     </nav>
 }
 
@@ -62,17 +68,14 @@ class App extends React.Component{
   {
     const state = this.state;
     var items = [
-      {name:"Browse Charities", onClick:this.navClick(this.navStates.browseCharities) },
-      {name:"Search Charities", onClick:this.navClick(this.navStates.searchCharities) },
-      {name:"Search Donors", onClick:this.navClick(this.navStates.searchDonors) },
-      {name:"Recent Transactions", onClick:this.navClick(this.navStates.recentTransactions) }
+      {name:"Browse Charities", state:this.navStates.browseCharities, onClick:this.navClick(this.navStates.browseCharities) },
+      {name:"Search Charities", state:this.navStates.searchCharities, onClick:this.navClick(this.navStates.searchCharities) },
+      {name:"Search Donors",  state:this.navStates.searchDonors, onClick:this.navClick(this.navStates.searchDonors) },
+      {name:"Recent Transactions",  state:this.navStates.recentTransactions, onClick:this.navClick(this.navStates.recentTransactions) }
     ];
     return (
-      <div>
-        <Nav items={items} />
-        <div>current nav state:{this.state.navState}</div>
-        <input type="text" onChange={(event)=>this.handleChange(event)}/>
-        <div>{state.text}</div>
+      <div className="container-fluid">
+        <Nav items={items} active={this.state.navState} />
       </div>
     )
   }
