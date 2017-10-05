@@ -50,21 +50,21 @@ class Transaction {
     }
 }
 
-class ProfileRepository = Base => class extends Base {
+var ProfileRepository = Base => class extends Base {
     getProfile(profile_id) { }
     createOrUpdateProfile(profile) { }
 }
 
-class TransactionRepository = Base => class extends Base {
+var TransactionRepository = Base => class extends Base {
     getTransaction(transaction_id) { }
     createOrUpdateTransaction(transaction) { }
 }
 
-class ProfileSearcher = Base => class extends Base {
+var ProfileSearcher = Base => class extends Base {
     findProfile(query){ }
 }
 
-class TransactionSearcher = Base => class extends Base {
+var TransactionSearcher = Base => class extends Base {
     findTransaction(query) { }
     getTransactionsForProfile(id) { }
 }
