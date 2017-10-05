@@ -74,13 +74,13 @@ class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepos
     constructor(){
         [this.profiles, this.transactions] = [[], []];
     }
-    getProfile(profile_id) { 
+    getProfile(profile_id) {
         return _.find(this.profiles, p => p.id === profile_id);
     }
-    getTransactionsForProfile(id) { 
+    getTransactionsForProfile(id) {
         return _.filter(this.transactions, t => t.from_id === id || t.to_id === id);
     }
-    createOrUpdateProfile(profile) { 
+    createOrUpdateProfile(profile) {
         var existingProf = getProfile(profile.id);
         if(existingProf)
         {
@@ -95,15 +95,15 @@ class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepos
     getTransaction(transaction_id) {
         return _.find(this.transactions, t => t.id === transaction_id);
     }
-    createOrUpdateTransaction(profile) { 
-    
+    createOrUpdateTransaction(profile) {
+
     }
-    findProfile(query) { 
+    findProfile(query) {
         var searchTest = new RegExp(query, "ig");
-    
-        return _.filter(this.profiles, p=> 
-            searchTest.test(p.id) 
-            || searchTest.test(p.name) 
+
+        return _.filter(this.profiles, p=>
+            searchTest.test(p.id)
+            || searchTest.test(p.name)
             || searchTest.test(p.description));
     }
 }
@@ -114,11 +114,12 @@ function populateDummyRepo(dummyRepo){
     if(!(dummyRepo instanceOf DummyRepository)){
         throw new Exception("populateDummyRepo called without DummyRepository");
     }
-    dummyRepo.profiles = 
+    dummyRepo.profiles =
 }
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(express.static("site"));
 
 //enable CORS
 app.use(function(req, res, next) {
@@ -130,8 +131,8 @@ app.use(function(req, res, next) {
 // test echo service
 app.get("/:name?", (req, res) => {
     res.setHeader("Content-Type", "text/json");
-    res.send(JSON.stringify({ 
-        name:req.params.name 
+    res.send(JSON.stringify({
+        name:req.params.name
     }))
 })
 
