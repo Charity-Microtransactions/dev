@@ -13,7 +13,6 @@ class Profile {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.type = "";
     }
     get type(){
         return this.type;
@@ -62,6 +61,7 @@ var TransactionRepository = Base => class extends Base {
 
 var ProfileSearcher = Base => class extends Base {
     findProfile(query){ }
+    browseProfiles(query) {}
 }
 
 var TransactionSearcher = Base => class extends Base {
@@ -102,12 +102,16 @@ class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepos
 
     }
     findProfile(query) {
+        if(!query) return this.browseProfiles();
         var searchTest = new RegExp(query, "ig");
 
         return _.filter(this.profiles, p=>
             searchTest.test(p.id)
             || searchTest.test(p.name)
             || searchTest.test(p.description));
+    }
+    browseProfiles(query) {
+      return this.profiles;
     }
 }
 
@@ -124,10 +128,8 @@ function populateDummyRepo(dummyRepo){
     dummyRepo.transactions = transactions;
 }
 
+populateDummyRepo(repo)
 
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-app.use(express.static("site"));
 
 //enable CORS
 app.use(function(req, res, next) {
@@ -136,14 +138,21 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get("/search", searchProfiles)
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use("/scripts", express.static("site"));
 
-app.get("/profile/:id?", getProfile)
-app.get("/profile/:id/transactions", getTransactionsByProfile);
-app.get("/transaction/:id?", getTransaction)
 
-app.post("/profile", createOrUpdateProfile);
-app.post("/transaction", createOrUpdateTransaction);
+app.get("/api/search", searchProfiles)
+
+app.get("/api/profile/:id?", getProfile)
+app.post("/api/profile/:id?", createOrUpdateProfile);
+
+app.get("/api/profile/:id/transactions", getTransactionsByProfile);
+
+app.get("/api/transaction/:id?", getTransaction)
+app.post("/api/transaction/:id?", createOrUpdateTransaction);
+
 
 function getProfile(req, res){
     res.send(repo.getProfile(req.params.id));
@@ -159,7 +168,7 @@ function createOrUpdateProfile(req, res){
 }
 
 function searchProfiles(req, res){
-    res.send(repo.findProfile(res.params.q));
+    res.send(repo.findProfile(req.query.q));
 }
 
 function getTransaction(req, res){
@@ -170,5 +179,9 @@ function createOrUpdateTransaction(req, res){
     repo.createOrUpdateTransaction(req.body);
     res.status(200).end();
 }
+
+app.use((req, res) =>{
+  res.sendFile(__dirname + "/site/index.html");
+})
 
 app.listen(3000, () => console.log("listening on port 3000"))

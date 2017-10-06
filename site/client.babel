@@ -1,84 +1,175 @@
-const endpoint = "https://runkit.io/edelmanja/charity-microtransactions/branches/master";
-
-function buildUrl(name){
-  return `${endpoint}/${name}`;
+const endpoint = "//localhost:3000/api";
+const routes = {
+  browse: `${endpoint}/search`,
+  search: (q) => `${endpoint}/search?q=${q}"`,
+  profile: (id) => `${endpoint}/profile/${id}`,
+  transactionsByProfile: (id) => `${endpoint}/profile/${id}/transactions`,
+  transaction: (id) => `${endpoint}/transaction/${id}`,
 }
 
-function getResponse(val){
-  return fetch(buildUrl(val));
+class CharityRepository {
+  constructor(){
+    this._charities = [];
+    this.fetched = false;
+  }
+  getCharity(charityId){
+    return this.charities.then(() => this._charities.filter(c => c.id == charityId)[0]);
+  }
+  get charities(){
+    if(!this.fetched){
+      return fetch(routes.browse)
+        .then(data => data.json())
+        .then(data => {
+          this.fetched = true;
+          this._charities = data;
+          return this._charities;
+        })
+    }else{
+      return new Promise((resolve, reject)=>resolve(this._charities));
+    }
+  }
 }
 
-function update(object, event){
-    return getResponse(event.target.value)
-      .then((data)=>{
-        console.log(data);
-        object.setState({ text: data })
-      .catch((err)=>console.log(err))
+var charityRepo = new CharityRepository();
 
-    })
-}
+const Router = ReactRouterDOM.BrowserRouter;
+const Link = ReactRouterDOM.Link;
+const Route = ReactRouterDOM.Route;
 
 function NavItem(props){
   var className = props.active ? "nav-item active" : "nav-item";
-  console.log(className);
-  return <li className={className}><a className="nav-link" href="#" onClick={props.onClick}>{props.name}</a></li>
+  return <li key={props.link} className={className}>
+    <Link to={props.link} className="nav-link" href="#">{props.name}</Link>
+  </li>
 }
 
 function Nav(props){
-  var items = [];
-  for(let item of props.items)
-    items.push(<NavItem active={props.active == item.state} onClick={item.onClick} name={item.name} />);
-
-  return <nav className="navbar navbar-light bg-faded">
-    <ul className="nav">
-      {items}
-    </ul>
+  var navitems = [
+    {name:"Browse Charities", state:"/browse-charities" },
+    {name:"Account", state:"/account" },
+  ];
+var items = navitems.map(item =>
+  <NavItem
+    active={props.active == item.state}
+    key={item.state}
+    link={item.state}
+    name={item.name} />);
+  return <nav className="navbar navbar-toggleable-md navbar-light">
+      <ul className="nav mr-auto bg-faded">
+        {items}
+      </ul>
     <form className="form-inline">
       <input type="text" className="form-control" placeholder="Search" />
       <button className="btn btn-outline-success">Search</button>
     </form>
+    <span className="nav-text"><a href="#">My Account</a></span>
     </nav>
 }
 
-class App extends React.Component{
-  constructor()
+function Charity(props){
+  return <div className="charity card">
+    <div className="card-block">
+      <h3 className="card-title name"><Link to={`/charity/${props.name}/${props.id}`}>{props.name}</Link></h3>
+      <div className="card-block description">{props.description}</div>
+    </div>
+  </div>
+}
+
+class AsyncComponent extends React.Component{
+  constructor(props)
   {
-    super()
-    this.navStates={
-      browseCharities:"browseCharities",
-      searchCharities:"searchCharities",
-      searchDonors:"searchDonors",
-      recentTransactions:"recentTransactions"
-    }
-    this.state = {
-      text:"",
-      navState:this.navStates.browseCharities
-    };
+    super(props);
+    this.fetched = false;
+    this.placeholder = props.placeholder || <div></div>
   }
 
-  handleChange(event){
-    update(this, event.target.value)
+  get asyncData(){
   }
 
-  navClick(navId){
-    return (evt)=>this.setState({ navState : navId });
+  componentDidMount(){
+    this.asyncData.then(data =>{
+      this.fetched = true;
+      this.setState(data);
+    });
   }
 
-  render()
-  {
-    const state = this.state;
-    var items = [
-      {name:"Browse Charities", state:this.navStates.browseCharities, onClick:this.navClick(this.navStates.browseCharities) },
-      {name:"Search Charities", state:this.navStates.searchCharities, onClick:this.navClick(this.navStates.searchCharities) },
-      {name:"Search Donors",  state:this.navStates.searchDonors, onClick:this.navClick(this.navStates.searchDonors) },
-      {name:"Recent Transactions",  state:this.navStates.recentTransactions, onClick:this.navClick(this.navStates.recentTransactions) }
-    ];
-    return (
-      <div className="container-fluid">
-        <Nav items={items} active={this.state.navState} />
-      </div>
-    )
+  render(){
+    if(!this.fetched)
+      return this.placeholder;
+    else
+      return this.renderAsync();
   }
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+class BrowseCharities extends React.Component{
+  constructor(){
+    super();
+    this.state = {charities:[]}
+  }
+
+  componentDidMount(){
+    this.update()
+  }
+
+  update(){
+    charityRepo.charities.then(data =>
+        this.setState({charities:data})
+      );
+  }
+
+  renderCharities(){
+    if(!this.state) return;
+    return this.state.charities.map(charity=>
+      <Charity key={charity.id} id={charity.id} name={charity.name.join(' ')} description={charity.description.join(' ')} />
+    )
+  }
+
+  render(){
+    return <div>
+      <h1>Browse Charities</h1>
+      <div>
+        {this.renderCharities()}
+      </div>
+    </div>
+  }
+}
+const Account = (props) =>
+  <div>
+    <h1>My Account</h1>
+  </div>
+
+class CharityDetailAsync extends AsyncComponent{
+  constructor(props){
+    super(props);
+    this.props = props;
+  }
+  get asyncData(){
+    return charityRepo.getCharity(this.props.id).then(charity=>{
+      return {charity:charity}
+    });
+  }
+  renderAsync(){
+    var charity = this.state.charity;
+    return <div>
+      <h1>{charity.name.join(' ')}</h1>
+      <div>{charity.description.join(' ')}</div>
+    </div>
+  }
+}
+
+const CharityDetail = (match) => <CharityDetailAsync id={match.match.params.id} />
+
+const App = (match) =>
+  <div>
+    <Route path="/account" component={Account} />
+    <Route path="/browse-charities" component={BrowseCharities} />
+    <Route path="/charity/:name/:id" component={CharityDetail} />
+    <Route exact path="/" component={BrowseCharities} />
+  </div>
+
+ReactDOM.render(<Router>
+  <div>
+    <Nav />
+    <Route path="/" component={App}></Route>
+</div>
+</Router>, document.getElementById("root"));
