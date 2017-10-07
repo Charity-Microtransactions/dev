@@ -19,12 +19,18 @@ class Profile {
     }
 }
 
+class Account {
+  constructor(userName = "", signedIn = false, currentTokens = 0){
+    [this.userName, this.signedIn, this.currentTokens] = [userName, signedIn, currentTokens];
+  }
+}
+
 function randomDonor(){
-    return new Donor (uuid(), randomWords(3), randomWords(50));
+    return new Donor (uuid(), randomWords(3).join(' '), randomWords(50).join(' '));
 }
 
 function randomCharity(){
-    return new Charity (uuid(), randomWords(3), randomWords(50));
+    return new Charity (uuid(), randomWords(3).join(' '), randomWords(50).join(' '));
 }
 
 function randomTransaction(from_id, to_id){
@@ -113,6 +119,9 @@ class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepos
     browseProfiles(query) {
       return this.profiles;
     }
+    getCurrentAccount(){
+      return this.currentAccount;;
+    }
 }
 
 var repo = new DummyRepository();
@@ -126,6 +135,7 @@ function populateDummyRepo(dummyRepo){
         (d,c) => randomTransaction(d.id, c.id));
     dummyRepo.profiles = _.union(donors, charities);
     dummyRepo.transactions = transactions;
+    dummyRepo.currentAccount = new Account(randomWords(3).join(' '), true, _.random(1,1000));
 }
 
 populateDummyRepo(repo)
@@ -144,7 +154,7 @@ app.use("/scripts", express.static("site"));
 
 
 app.get("/api/search", searchProfiles)
-
+app.get("/api/account", getCurrentAccount)
 app.get("/api/profile/:id?", getProfile)
 app.post("/api/profile/:id?", createOrUpdateProfile);
 
@@ -153,6 +163,9 @@ app.get("/api/profile/:id/transactions", getTransactionsByProfile);
 app.get("/api/transaction/:id?", getTransaction)
 app.post("/api/transaction/:id?", createOrUpdateTransaction);
 
+function getCurrentAccount(req, res){
+  res.send(repo.getCurrentAccount())
+}
 
 function getProfile(req, res){
     res.send(repo.getProfile(req.params.id));
