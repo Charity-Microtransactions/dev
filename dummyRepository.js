@@ -52,7 +52,7 @@ class DummyRepository extends classes.ProfileSearcher(classes.ProfileRepository(
       return this.profiles;
     }
     getCurrentAccount(){
-      return this.currentAccount;;
+      return this.currentAccount;
     }
 }
 function populateDummyRepo(dummyRepo){
