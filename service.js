@@ -1,144 +1,22 @@
 var express = require("express");
-var _ = require("underscore");
 var bodyParser = require("body-parser");
 var randomWords = require("random-words")
 var uuid = require("uuid/v4");
 var aws = require('aws-sdk')
 var app = express();
-const DONOR_TYPE = "DONOR";
-const CHARITY_TYPE = "CHARITY";
+const classes = require("./classes")
+const Profile = classes.Profile;
+const Account = classes.Account;
 
-class Profile {
-    constructor (id, name, description){
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
-    get type(){
-        return this.type;
-    }
-}
+const randos = require("./randos");
+const randomDonor = randos.randomDonor;
+const randomCharity = randos.randomCharity;
+const randomTransaction = randos.randomTransaction;
 
-class Account {
-  constructor(userName = "", signedIn = false, currentTokens = 0){
-    [this.userName, this.signedIn, this.currentTokens] = [userName, signedIn, currentTokens];
-  }
-}
+const DummyRepository = require("./dummyRepository");
 
-function randomDonor(){
-    return new Donor (uuid(), randomWords(3).join(' '), randomWords(50).join(' '));
-}
-
-function randomCharity(){
-    return new Charity (uuid(), randomWords(3).join(' '), randomWords(50).join(' '));
-}
-
-function randomTransaction(from_id, to_id){
-    return new Transaction(uuid, from_id, to_id, _.random(1,1000), new Date());
-}
-
-class Donor extends Profile {
-    get type(){ return DONOR_TYPE; }
-}
-
-class Charity extends Profile {
-    get type() { return CHARITY_TYPE; }
-}
-
-class Transaction {
-    constructor (id, from_id, to_id, amount, date){
-        this.id = id;
-        this.from_id = from_id;
-        this.to_id = to_id;
-        this.amount = amount;
-        this.date  = date;
-    }
-}
-
-var ProfileRepository = Base => class extends Base {
-    getProfile(profile_id) { }
-    createOrUpdateProfile(profile) { }
-}
-
-var TransactionRepository = Base => class extends Base {
-    getTransaction(transaction_id) { }
-    createOrUpdateTransaction(transaction) { }
-}
-
-var ProfileSearcher = Base => class extends Base {
-    findProfile(query){ }
-    browseProfiles(query) {}
-}
-
-var TransactionSearcher = Base => class extends Base {
-    findTransaction(query) { }
-    getTransactionsForProfile(id) { }
-}
-
-
-class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepository(Object)))
-{
-    constructor(){
-      super();
-        this.profiles = [];
-        this.transactions = [];
-    }
-    getProfile(profile_id) {
-        return _.find(this.profiles, p => p.id === profile_id);
-    }
-    getTransactionsForProfile(id) {
-        return _.filter(this.transactions, t => t.from_id === id || t.to_id === id);
-    }
-    createOrUpdateProfile(profile) {
-        var existingProf = getProfile(profile.id);
-        if(existingProf)
-        {
-            var idx = _.indexOf(this.profiles, existingProf);
-            this.profiles[idx] = profile;
-        }
-        else
-        {
-            this.profiles.push(profile);
-        }
-    }
-    getTransaction(transaction_id) {
-        return _.find(this.transactions, t => t.id === transaction_id);
-    }
-    createOrUpdateTransaction(profile) {
-
-    }
-    findProfile(query) {
-        if(!query) return this.browseProfiles();
-        var searchTest = new RegExp(query, "ig");
-
-        return _.filter(this.profiles, p=>
-            searchTest.test(p.id)
-            || searchTest.test(p.name)
-            || searchTest.test(p.description));
-    }
-    browseProfiles(query) {
-      return this.profiles;
-    }
-    getCurrentAccount(){
-      return this.currentAccount;;
-    }
-}
-
-var repo = new DummyRepository();
-
-function populateDummyRepo(dummyRepo){
-    var donors = _.range(10).map(randomDonor);
-    var charities = _.range(10).map(randomCharity);
-    var transactions = _.zip(
-        _.sample(donors, 50),
-        _.sample(charities, 50),
-        (d,c) => randomTransaction(d.id, c.id));
-    dummyRepo.profiles = _.union(donors, charities);
-    dummyRepo.transactions = transactions;
-    dummyRepo.currentAccount = new Account(randomWords(3).join(' '), true, _.random(1,1000));
-}
-
-populateDummyRepo(repo)
+const repo = new DummyRepository.DummyRepository();
+DummyRepository.populateDummyRepo(repo);
 
 
 //enable CORS
@@ -151,7 +29,6 @@ app.use(function(req, res, next) {
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use("/scripts", express.static("site"));
-
 
 app.get("/api/search", searchProfiles)
 app.get("/api/account", getCurrentAccount)
@@ -193,6 +70,7 @@ function createOrUpdateTransaction(req, res){
     res.status(200).end();
 }
 
+//enable SPA
 app.use((req, res) =>{
   res.sendFile(__dirname + "/site/index.html");
 })
