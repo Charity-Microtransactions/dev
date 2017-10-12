@@ -1,23 +1,38 @@
 {
-  "name":"charity-microtransactions",
-  "version":"0.0.1",
-  "bugs":{
-    "url":"https://github.com/Charity-Microtransactions/dev/issues",
-    "email":"edelmanja@gmail.com"
+  "name": "charity-microtransactions",
+  "version": "0.0.1",
+  "bugs": {
+    "url": "https://github.com/Charity-Microtransactions/dev/issues",
+    "email": "edelmanja@gmail.com"
   },
-  "license":"MIT",
-  "main":"service/service.js",
-  "repository":{
-    "type":"git",
-    "url":"https://github.com/Charity-Microtransactions/dev.git"
+  "license": "MIT",
+  "main": "build/service.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Charity-Microtransactions/dev.git"
   },
-  "dependencies":{
-    "gulp":"*",
-    "express":"*",
-    "underscore":"*",
-    "body-parser":"*",
-    "random-words":"*",
-    "uuid":"*",
-    "aws-sdk":"*"
+  "dependencies": {
+    "gulp": "*",
+    "express": "*",
+    "underscore": "*",
+    "body-parser": "*",
+    "random-words": "*",
+    "uuid": "*",
+    "aws-sdk": "*"
+  },
+  "scripts": {
+    "start": "node build/service/service.js"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "browser-sync": "^2.18.13",
+    "browsersync": "0.0.1-security",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-jsx": "^2.0.1",
+    "gulp-notify": "^3.0.0",
+    "gulp-watch": "^4.3.11"
   }
 }

@@ -1,4 +1,4 @@
-const endpoint = "//localhost:3000/api";
+const endpoint = "/api";
 const routes = {
   browse: `${endpoint}/search`,
   account: `${endpoint}/account`,
@@ -8,7 +8,7 @@ const routes = {
   transaction: (id) => `${endpoint}/transaction/${id}`,
 }
 
-const AsyncComponent = (getData, renderAsync, placeHolder = <div></div>) =>
+const AsyncComponent = (getData, renderAsync) =>
   class extends React.Component
   {
     constructor(props)
@@ -16,15 +16,17 @@ const AsyncComponent = (getData, renderAsync, placeHolder = <div></div>) =>
       super(props);
       this.props = props;
       this.fetched = false;
+      this.placeHolder = <div></div>;
     }
 
-    componentDidMount = () =>
-      getData(this.props).then(data => {
+    componentDidMount(){
+      return getData(this.props).then(data => {
         this.fetched = true;
         this.setState(data);
       });
+    }
 
-    render = () => !this.fetched ? placeHolder : renderAsync(this.state);
+    render(){ return !this.fetched ? placeHolder : renderAsync(this.state); }
   }
 
 class Account {
@@ -37,9 +39,10 @@ class AccountRepository{
   constructor(){
     this.currentUser = new Account("Guest");
   }
-  getAccount = () => fetch(routes.account)
+  getAccount(){
+    return fetch(routes.account)
       .then(data => data.json())
-      .then(data => new Account(data.userName, data.signedIn, data.currentTokens));
+      .then(data => new Account(data.userName, data.signedIn, data.currentTokens));}
 }
 
 class CharityRepository {
@@ -48,8 +51,10 @@ class CharityRepository {
     this.fetched = false;
   }
 
-  getCharity = charityId => this.charities
+  getCharity(charityId){
+    return this.charities
     .then(() => this._charities.filter(c => c.id == charityId)[0]);
+  }
 
   get charities(){
     if(!this.fetched){

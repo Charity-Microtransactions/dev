@@ -1,9 +1,10 @@
-var express = require("express");
-var bodyParser = require("body-parser");
-var app = express();
+const express = require("express");
+const bodyParser = require("body-parser");
+const app = express();
 
 const DummyRepository = require("./dummyRepository");
 const repo = new DummyRepository.DummyRepository();
+
 DummyRepository.populateDummyRepo(repo);
 
 //enable CORS
@@ -16,7 +17,7 @@ app.use(function(req, res, next) {
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-app.use("/scripts", express.static("site"));
+app.use("/scripts", express.static(__dirname + "/site"));
 
 const SearchRouter = require("./routers/SearchRouter");
 app.use("/api/search", SearchRouter.create(repo))
