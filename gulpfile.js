@@ -20,13 +20,11 @@ const clean = () => del(["build/**/*.*"]);
 const src = ()=>
   gulp.src([paths.html.src,paths.js.src])
     .pipe(gulp.dest(paths.html.dest))
-    .pipe(notify("src update successful"))
 
 const compile = ()=>
   gulp.src(paths.babel.src)
     .pipe(babel(babelOpts).on('error', notify.onError(err => err.message)))
     .pipe(gulp.dest(paths.babel.dest))
-    .pipe(notify("compile successful"))
 
 const watch = () => gulp.watch([paths.js.src, paths.babel.src], ['clean','src','compile','start']);
 

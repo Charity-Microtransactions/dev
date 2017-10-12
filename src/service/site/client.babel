@@ -26,7 +26,7 @@ const AsyncComponent = (getData, renderAsync) =>
       });
     }
 
-    render(){ return !this.fetched ? placeHolder : renderAsync(this.state); }
+    render(){ return !this.fetched ? this.placeHolder : renderAsync(this.state); }
   }
 
 class Account {

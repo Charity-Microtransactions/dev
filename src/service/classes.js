@@ -36,6 +36,11 @@ class Account {
   }
 }
 
+const AccountRepository = Base => class extends Base {
+  attemptLogin(username, password) {}
+  getCurrentAccount(sessionToken) {}
+  logout() {}
+}
 
 const ProfileRepository = Base => class extends Base {
     getProfile(profile_id) { }
