@@ -1,14 +1,19 @@
 const _ = require("underscore");
+const randomWords = require("random-words");
+
+const randos = require("./randos");
 const classes = require("./classes");
+
 const Profile = classes.Profile;
 const Account = classes.Account;
-const randomWords = require("random-words");
-const randos = require("./randos");
 const randomDonor = randos.randomDonor;
 const randomCharity = randos.randomCharity;
 const randomTransaction = randos.randomTransaction;
+const ProfileRepository = classes.Repositories.ProfileRepository;
+const TransactionRepository = classes.Repositories.TransactionRepository;
+const ProfileSearcher = classes.Searchers.ProfileSearcher;
 
-class DummyRepository extends classes.ProfileSearcher(classes.ProfileRepository(classes.TransactionRepository(Object)))
+class DummyRepository extends ProfileSearcher(ProfileRepository(TransactionRepository(Object)))
 {
     constructor(){
       super();

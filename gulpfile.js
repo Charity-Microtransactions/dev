@@ -30,7 +30,7 @@ const compile = ()=>
     .pipe(gulp.dest(paths.babel.dest))
 
 
-const watch = () => gulp.watch([paths.js.src, paths.babel.src], ['clean','src','compile','start']);
+const watch = () => gulp.watch([paths.js.src, paths.babel.src], ['clean','src','compile','webpack']);
 
 const clientjs = "build/service/site/client.js";
 const bundlejs = "service/site/bundle.js";
@@ -46,5 +46,5 @@ gulp.task("start", ['src','compile', 'webpack'], nodemon);
 gulp.task("clean", clean);
 gulp.task('compile', ['clean','src'], compile);
 gulp.task('src',['clean'], src);
-gulp.task('watch',['compile','src'], watch);
-gulp.task('default', ['clean','watch', 'start']);
+gulp.task('watch',['compile','src','webpack'], watch);
+gulp.task('default', ['clean','watch','start']);
