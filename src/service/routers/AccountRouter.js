@@ -4,10 +4,11 @@ exports.create = repo =>{
   router.get("/", getCurrentAccount)
   router.post("/login", login)
   function login(req, res){
-    var success = repo.attemptLogin(req.body.userName, req.body.password);
+    var sessionToken = repo.attemptLogin(req.body.userName, req.body.password);
     res.send({
       loginAttempt:{
-        success:success,
+        success:!!sessionToken,
+        token:sessionToken,
         account:repo.getCurrentAccount()
       }
     });

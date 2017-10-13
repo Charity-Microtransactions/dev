@@ -6,7 +6,7 @@
     "email": "edelmanja@gmail.com"
   },
   "license": "MIT",
-  "main": "build/service.js",
+  "main": "build/service/service.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Charity-Microtransactions/dev.git"
@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "browser-sync": "^2.18.13",
     "browsersync": "0.0.1-security",
@@ -32,7 +33,12 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.0",
     "gulp-jsx": "^2.0.1",
+    "gulp-nodemon": "^2.2.1",
     "gulp-notify": "^3.0.0",
-    "gulp-watch": "^4.3.11"
+    "gulp-watch": "^4.3.11",
+    "gulp-webpack": "^1.5.0",
+    "nodemon": "^1.12.1",
+    "webpack": "^3.7.1",
+    "webpack-dev-server": "^2.9.1"
   }
 }

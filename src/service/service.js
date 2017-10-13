@@ -17,7 +17,7 @@ app.use(function(req, res, next) {
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-app.use("/scripts", express.static(__dirname + "/site"));
+app.use("/scripts", express.static(__dirname + "/site/"));
 
 const SearchRouter = require("./routers/SearchRouter");
 app.use("/api/search", SearchRouter.create(repo))

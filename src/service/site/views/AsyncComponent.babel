@@ -1,0 +1,22 @@
+const AsyncComponent = (getData, renderAsync) =>
+  class extends React.Component
+  {
+    constructor(props)
+    {
+      super(props);
+      this.props = props;
+      this.fetched = false;
+      this.placeHolder = <div></div>;
+    }
+
+    componentDidMount(){
+      return getData(this.props).then(data => {
+        this.fetched = true;
+        this.setState(data);
+      });
+    }
+
+    render(){ return !this.fetched ? this.placeHolder : renderAsync(this.state); }
+  }
+
+module.exports = AsyncComponent;
