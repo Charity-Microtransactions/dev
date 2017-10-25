@@ -1,6 +1,9 @@
 const AsyncComponent = require('./AsyncComponent.js');
 
 const AccountView = AsyncComponent (props =>  props.accountRepo.getAccount(), state =>
-    <span className="btn btn-outline-success">{state.userName} {state.currentTokens} tokens remaining</span>)
+    <span>
+      <span className="btn">{state.userName}</span>
+      <span className="btn">{state.currentTokens} tokens remaining</span>
+    </span>)
 
 module.exports = AccountView;
